@@ -6,27 +6,12 @@ const rvmSchema = new Schema({
     type: String,
     required: true,
   },
-  payloadCategory: {
-    type: String, //DEVICE | PHERIPHERAL | COMPONENT
-    required: true,
-    default: "DEVICE",
-  },
-  payloadWeight: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  scanResult: {
-    type: String, //NONE, SUCCESS, FAILED
-    required: true,
-    default: "NONE",
-  },
   status: {
-    type: String, //PENDING | PROCESSING | SCANNING
+    type: String, //IDLE | SCANNING
     required: true,
-    default: "PENDING",
+    default: "IDLE",
   },
-  progress: {
+  binGauge: {
     type: Number,
     required: true,
     default: 0,
@@ -39,7 +24,8 @@ const rvmSchema = new Schema({
     type: Number,
     required: true,
     default: 3,
-  }
+  },
+  collectionHistory: [{ type: Object }],
 });
 
 module.exports = mongoose.model("RVM", rvmSchema);

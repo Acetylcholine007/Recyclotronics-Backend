@@ -13,7 +13,7 @@ exports.getScraps = async (req, res, next) => {
 
     res.status(200).json({
       message: "Scraps fetched successfully.",
-      scraps,
+      data: scraps,
       totalItems,
     });
   } catch (err) {

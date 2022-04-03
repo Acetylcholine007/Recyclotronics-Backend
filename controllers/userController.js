@@ -5,6 +5,7 @@ const User = require("../models/User");
 
 exports.signup = async (req, res, next) => {
   try {
+    console.log(req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const error = new Error("Failed to pass validation");
@@ -63,7 +64,7 @@ exports.login = async (req, res, next) => {
     );
     res.status(200).json({
       message: "Successfully logged In",
-      data: { token: token, userId: loadedUser._id.toString(), accountType: 1 },
+      data: { token: token, userId: loadedUser._id.toString(), accountType: loadedUser.accountType },
     });
   } catch (err) {
     if (!err.statusCode) {
@@ -90,7 +91,7 @@ exports.getUsers = async (req, res, next) => {
 
     res.status(200).json({
       message: "Users fetched successfully.",
-      users,
+      data: users,
       totalItems,
     });
   } catch (err) {
@@ -115,7 +116,7 @@ exports.getUser = async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
-    res.status(200).json({ message: "User fetched.", user });
+    res.status(200).json({ message: "User fetched.", data: user });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

@@ -22,10 +22,22 @@ router.post(
   rvmController.postRVM
 );
 
-router.get("/:rvmSerial", rvmController.getRVM);
+router.get("/:rvmSerial", userAuthMW, rvmController.getRVM);
 
-router.patch("/:rvmSerial", rvmController.patchRVM);
+router.patch(
+  "/initiateScan/:rvmSerial",
+  userAuthMW,
+  rvmController.initiateScan
+);
 
-router.put("/:rvmSerial", rvmController.putRVM);
+router.patch("/reportScan/:rvmSerial", rvmController.reportScan); //For RVM machine
+
+router.patch("/reportStatus/:rvmSerial", rvmController.reportStatus); //For RVM machine
+
+router.put("/updateRVM/:rvmSerial", userAuthMW, rvmController.putRVM);
+
+router.post("/sendNotification", userAuthMW, rvmController.sendNotification);
+
+router.post("/collect", userAuthMW, rvmController.collect);
 
 module.exports = router;

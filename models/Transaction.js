@@ -9,7 +9,7 @@ const transactionSchema = new Schema(
       required: true,
     },
     action: {
-      type: String,
+      type: String, // DEPOSIT || REDEEM
       required: true,
     },
     data: {
