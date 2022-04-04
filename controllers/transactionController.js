@@ -7,12 +7,13 @@ exports.getTransactions = async (req, res, next) => {
   const perPage = 12;
   try {
     const totalItems = await Transaction.find(
-      target ? { action } : {}
+      action ? { action } : {}
     ).countDocuments();
-    const transactions = await Transaction.find()
+    const transactions = await Transaction.find(action ? { action } : {})
       .sort({ createdAt: -1 })
       .skip((currentPage - 1) * perPage)
-      .limit(perPage);
+      .limit(perPage)
+      .populate("user");
     res.status(200).json({
       message: "Transactions fetched successfully.",
       data: transactions,
@@ -55,12 +56,15 @@ exports.getUserTransactions = async (req, res, next) => {
   const perPage = 12;
   try {
     const totalItems = await Transaction.find(
-      target ? { user: userId, action } : { user: userId }
+      action ? { user: userId, action } : { user: userId }
     ).countDocuments();
-    const transactions = await Transaction.find()
+    const transactions = await Transaction.find(
+      action ? { user: userId, action } : { user: userId }
+    )
       .sort({ createdAt: -1 })
       .skip((currentPage - 1) * perPage)
-      .limit(perPage);
+      .limit(perPage)
+      .populate("user");
     res.status(200).json({
       message: "Transactions fetched successfully.",
       data: transactions,

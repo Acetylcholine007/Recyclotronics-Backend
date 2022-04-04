@@ -6,6 +6,11 @@ const rvmSchema = new Schema({
     type: String,
     required: true,
   },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+  },
   status: {
     type: String, //IDLE | SCANNING
     required: true,

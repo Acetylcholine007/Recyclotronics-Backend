@@ -75,13 +75,14 @@ exports.putScrap = async (req, res, next) => {
     }
     const scrapId = req.params.scrapId;
     const scrap = await Scrap.findById(scrapId);
-
+    
     scrap.name = req.body.name;
     scrap.pointsPerGram = req.body.pointsPerGram;
     scrap.pesoPerPoints = req.body.pesoPerPoints;
     await scrap.save();
     res.status(201).json({
       message: "Scrap updated",
+      data: scrap,
     });
   } catch (err) {
     if (!err.statusCode) {
