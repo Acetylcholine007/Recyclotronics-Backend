@@ -3,6 +3,7 @@ const RVM = require("../models/RVM");
 const Scrap = require("../models/Scrap");
 const Transaction = require("../models/Transaction");
 const User = require("../models/User");
+const io = require("../utils/socket");
 
 exports.getRVM = async (req, res, next) => {
   try {
@@ -49,19 +50,29 @@ exports.initiateScan = async (req, res, next) => {
   try {
     const rvmSerial = req.params.rvmSerial;
     const rvm = await RVM.findOne({ rvmSerial });
+
     if (!rvm) {
       const error = new Error("Could not find RVM.");
       error.statusCode = 404;
       throw error;
     }
-    if (rvm.status === "IDLE") {
+
+    const difference = new Date() - new Date(rvm.updatedAt);
+    const isTimedOut = difference / 60000 > rvm.timeout;
+
+    if (rvm.status === "IDLE" || (rvm.status === "SCANNING" && isTimedOut)) {
       rvm.status = "SCANNING";
       rvm.user = req.userId;
-      //TODO: Update timestamp
       await rvm.save();
       res.status(200).json({ message: "RVM scan initiated." });
+    } else if (
+      rvm.status === "SCANNING" &&
+      req.userId === rvm.user.toString() &&
+      !isTimedOut
+    ) {
+      res.status(200).json({ message: "RVM scan already initiated." });
     } else {
-      res.status(200).json({ message: "RVM is busy scanning." });
+      res.status(409).json({ message: "RVM is busy scanning." });
     }
   } catch (err) {
     if (!err.statusCode) {
@@ -81,8 +92,8 @@ exports.reportScan = async (req, res, next) => {
       throw error;
     }
     if (rvm.status === "SCANNING") {
+      const scrap = await Scrap.findOne({ name: req.body.scrapType });
       if (req.body.scanResult === true) {
-        const scrap = await Scrap.findOne({ name: req.body.scrapType });
         const transaction = new Transaction({
           user: rvm.user,
           action: "DEPOSIT",
@@ -97,20 +108,41 @@ exports.reportScan = async (req, res, next) => {
         const user = await User.findById(rvm.user);
         user.points += req.body.weight * scrap.pointsPerGram;
         await user.save();
-        res
-          .status(200)
-          .json({ message: "Scan report acknowledged", data: req.body.scanResult });
+
+        io.getIO().emit("scan", {
+          scanResult: req.body.scanResult,
+          payload: {
+            scrapType: req.body.scrapType,
+            weight: req.body.weight,
+            pointsPerGram: scrap.pointsPerGram,
+            pesoPerPoints: scrap.pesoPerPoints,
+          },
+        });
+
+        res.status(200).json({
+          message: "Scan report acknowledged",
+          data: req.body.scanResult,
+        });
       } else {
-        res
-          .status(200)
-          .json({ message: "Scan report acknowledged", data: req.body.scanResult });
+        io.getIO().emit("scan", {
+          scanResult: req.body.scanResult,
+          payload: {
+            scrapType: req.body.scrapType,
+            weight: 0,
+            pointsPerGram: 0,
+            pesoPerPoints: 0,
+          },
+        });
+
+        res.status(200).json({
+          message: "Scan report acknowledged",
+          data: req.body.scanResult,
+        });
       }
 
       rvm.status = "IDLE";
       rvm.user = null;
-
       await rvm.save();
-      //TODO: Web socket logic
     } else {
       res
         .status(200)
