@@ -1,5 +1,8 @@
 const { validationResult } = require("express-validator/check");
 const Transaction = require("../models/Transaction");
+const sendMail = require("../utils/sendMail");
+const ejs = require("ejs");
+const path = require("path");
 
 exports.getTransactions = async (req, res, next) => {
   const action = req.query.target || null;
@@ -40,8 +43,15 @@ exports.deleteTransactions = async (req, res, next) => {
 
 exports.redeem = async (req, res, next) => {
   try {
+    const htmlTemplate = await ejs.renderFile(
+      path.join(__dirname, "../views/redeemPoints.ejs"),
+      {
+        points: 50,
+      }
+    );
+    sendMail.sendMail("rahinoquijano@gmail.com", "REDEEM POINTS", htmlTemplate);
     res.status(200).json({ message: "Points redeem" });
-  } catch (e) {
+  } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }
