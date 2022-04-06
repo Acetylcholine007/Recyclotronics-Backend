@@ -1,82 +1,9 @@
 const { validationResult } = require("express-validator/check");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-
-exports.signup = async (req, res, next) => {
-  try {
-    console.log(req.body);
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error("Failed to pass validation");
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
-    const fullname = req.body.fullname;
-    const email = req.body.email;
-    const password = req.body.password;
-    const hashedPw = await bcrypt.hash(password, 12);
-
-    const user = new User({
-      fullname,
-      email,
-      password: hashedPw,
-    });
-    const result = await user.save();
-    res
-      .status(201)
-      .json({ message: "User created", data: { userId: result._id } });
-  } catch (err) {
-    if (!err.statusCode) {
-      err.statusCode = 500;
-    }
-    next(err);
-  }
-};
-
-exports.login = async (req, res, next) => {
-  try {
-    const email = req.body.email;
-    const password = req.body.password;
-    let loadedUser;
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      const error = new Error("Email does not exist");
-      error.statusCode = 401;
-      throw error;
-    }
-    loadedUser = user;
-    const isEqual = await bcrypt.compare(password, user.password);
-    if (!isEqual) {
-      const error = new Error("Incorrect password");
-      error.statusCode = 401;
-      throw error;
-    }
-    const token = jwt.sign(
-      {
-        email: loadedUser.email,
-        userId: loadedUser._id.toString(),
-        accountType: loadedUser.accountType
-      },
-      process.env.SECRET_KEY
-      // { expiresIn: "1h" }
-    );
-    res.status(200).json({
-      message: "Successfully logged In",
-      data: { token: token, userId: loadedUser._id.toString(), accountType: loadedUser.accountType },
-    });
-  } catch (err) {
-    if (!err.statusCode) {
-      err.statusCode = 500;
-    }
-    next(err);
-  }
-};
 
 exports.getUsers = async (req, res, next) => {
   try {
-    if(req.accountType !== 2) {
+    if (req.accountType !== 2) {
       const error = new Error("Forbidden");
       error.statusCode = 403;
       throw error;
@@ -105,7 +32,7 @@ exports.getUsers = async (req, res, next) => {
 exports.getUser = async (req, res, next) => {
   try {
     const userId = req.params.userId;
-    if(req.accountType !== 2 && req.userId !== userId) {
+    if (req.accountType !== 2 && req.userId !== userId) {
       const error = new Error("Forbidden");
       error.statusCode = 403;
       throw error;
@@ -135,7 +62,7 @@ exports.putUser = async (req, res, next) => {
       throw error;
     }
     const userId = req.params.userId;
-    if(req.accountType !== 2 && req.userId !== userId) {
+    if (req.accountType !== 2 && req.userId !== userId) {
       const error = new Error("Forbidden");
       error.statusCode = 403;
       throw error;
@@ -161,7 +88,7 @@ exports.putUser = async (req, res, next) => {
 exports.deleteUser = async (req, res, next) => {
   try {
     const userId = req.params.userId;
-    if(req.accountType !== 2 && req.userId !== userId) {
+    if (req.accountType !== 2 && req.userId !== userId) {
       const error = new Error("Forbidden");
       error.statusCode = 403;
       throw error;
@@ -182,16 +109,5 @@ exports.deleteUser = async (req, res, next) => {
       err.statusCode = 500;
     }
     next(err);
-  }
-
-  exports.verifyUser = async (req,res,next) => {
-    try {
-      //TODO: implement verification
-    } catch (e) {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
-    }
   }
 };

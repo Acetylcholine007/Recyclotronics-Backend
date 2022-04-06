@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator/check");
 const Transaction = require("../models/Transaction");
+const User = require("../models/User");
 const sendMail = require("../utils/sendMail");
 const ejs = require("ejs");
 const path = require("path");
@@ -43,14 +44,41 @@ exports.deleteTransactions = async (req, res, next) => {
 
 exports.redeem = async (req, res, next) => {
   try {
-    const htmlTemplate = await ejs.renderFile(
-      path.join(__dirname, "../views/redeemPoints.ejs"),
-      {
-        points: 50,
-      }
-    );
-    sendMail.sendMail("rahinoquijano@gmail.com", "REDEEM POINTS", htmlTemplate);
-    res.status(200).json({ message: "Points redeem" });
+    const user = await User.findById(req.userId);
+    const amount = req.body.amount;
+
+    // const transactions = await Promise.all(
+    //   transactionIds.map(async (id) => {
+    //     return await Transaction.findById(id);
+    //   })
+    // );
+
+    if (amount <= user.points) {
+      user.points -= amount;
+      const transaction = new Transaction({
+        user: user._id,
+        action: "REDEEM",
+        data: { amount },
+      });
+      await user.save();
+      await transaction.save();
+      const htmlTemplate = await ejs.renderFile(
+        path.join(__dirname, "../views/redeemPoints.ejs"),
+        { amount }
+      );
+      sendMail.sendMail(
+        "rahinoquijano@gmail.com",
+        "REDEEM POINTS",
+        htmlTemplate
+      );
+      res
+        .status(200)
+        .json({ message: "Amount redeemed", data: { balance: user.points } });
+    } else {
+      res.status(406).json({
+        message: "Amount trying to claim is more than the amount you have.",
+      });
+    }
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

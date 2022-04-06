@@ -2,7 +2,8 @@ const express = require("express");
 const { body } = require("express-validator/check");
 
 const User = require("../models/User");
-const userController = require("../controllers/userController");
+const authController = require("../controllers/authController");
+const userVerificationMW = require("../middlewares/userVerificationMW");
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ router.post(
     body("password").trim().isLength({ min: 5 }),
     body("fullname").trim().not().isEmpty(),
   ],
-  userController.signup
+  authController.signup
 );
 
 router.post(
@@ -32,7 +33,20 @@ router.post(
     body("email").isEmail().trim().not().isEmpty(),
     body("password").trim().not().isEmpty(),
   ],
-  userController.login
+  authController.login
+);
+
+router.post(
+  "/user/verify",
+  [body("verificationToken").not().isEmpty()],
+  userVerificationMW,
+  authController.verifyUser
+);
+
+router.post(
+  "/user/sendVerification",
+  [body("email").isEmail().trim().not().isEmpty()],
+  authController.sendVerification
 );
 
 module.exports = router;

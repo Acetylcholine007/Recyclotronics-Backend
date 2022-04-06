@@ -1,13 +1,20 @@
 const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator/check");
 
 module.exports = (req, res, next) => {
-  const authHeader = req.get("Authorization");
-  if (!authHeader) {
-    const error = new Error("Not authenticated.");
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error("Failed to pass validation");
+    error.statusCode = 422;
+    error.data = errors.array();
+    throw error;
+  }
+  const token = req.body.verificationToken;
+  if (!token) {
+    const error = new Error("Failed to verify.");
     error.statusCode = 401;
     throw error;
   }
-  const token = authHeader.split(" ")[1];
   let decodedToken;
   try {
     decodedToken = jwt.verify(token, process.env.SECRET_KEY);
@@ -16,11 +23,10 @@ module.exports = (req, res, next) => {
     throw err;
   }
   if (!decodedToken) {
-    const error = new Error("Not authenticated.");
+    const error = new Error("Failed to verify.");
     error.statusCode = 401;
     throw error;
   }
-  req.userId = decodedToken.userId;
-  req.accountType = decodedToken.accountType;
+  req.verifyEmail = decodedToken.verifyEmail;
   next();
 };
