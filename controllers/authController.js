@@ -4,6 +4,7 @@ const User = require("../models/User");
 const sendMail = require("../utils/sendMail");
 const ejs = require("ejs");
 const path = require("path");
+const { validationResult } = require("express-validator/check");
 
 exports.signup = async (req, res, next) => {
   try {
@@ -82,12 +83,18 @@ exports.login = async (req, res, next) => {
 
 exports.verifyUser = async (req, res, next) => {
   try {
-    const user = await User.find({ email: req.verifyEmail });
+    const user = await User.findOne({ email: req.verifyEmail });
+    console.log(user);
+    if (!user) {
+      const error = new Error("Email does not exist");
+      error.statusCode = 401;
+      throw error;
+    }
     user.isVerified = true;
     await user.save();
-    console.log(user);
-    res.status(201).json({
-      message: "User verified",
+
+    res.render('verificationResult', {
+      message: "Verification successful"
     });
   } catch (err) {
     if (!err.statusCode) {
@@ -106,6 +113,7 @@ exports.sendVerification = async (req, res, next) => {
       process.env.SECRET_KEY,
       { expiresIn: "1h" }
     );
+    console.log(verificationToken);
 
     const htmlTemplate = await ejs.renderFile(
       path.join(__dirname, "../views/emailVerification.ejs"),

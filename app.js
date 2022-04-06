@@ -14,8 +14,12 @@ const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
 app.use(helmet());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(corsMW);
 
 app.use("/auth", authRoutes);
