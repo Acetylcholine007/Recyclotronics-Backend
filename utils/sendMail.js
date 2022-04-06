@@ -1,5 +1,4 @@
 const nodemailer = require("nodemailer");
-const mailgunTransport = require("nodemailer-mailgun-transport");
 
 module.exports = {
   sendMail: (email, subject, htmlTemplate) => {
