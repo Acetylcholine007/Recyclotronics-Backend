@@ -27,6 +27,27 @@ exports.signup = async (req, res, next) => {
       password: hashedPw,
     });
     const result = await user.save();
+    
+    //Email verification logic
+    const verificationToken = jwt.sign(
+      {
+        verifyEmail: req.body.email,
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+    console.log(verificationToken);
+
+    const htmlTemplate = await ejs.renderFile(
+      path.join(__dirname, "../views/emailVerification.ejs"),
+      { verificationToken }
+    );
+    sendMail.sendMail(
+      req.body.email,
+      "VERIFY EMAIL",
+      htmlTemplate
+    );
+
     res
       .status(201)
       .json({ message: "User created", data: { userId: result._id } });
@@ -54,6 +75,11 @@ exports.login = async (req, res, next) => {
     if (!isEqual) {
       const error = new Error("Incorrect password");
       error.statusCode = 401;
+      throw error;
+    }
+    if (!user.isVerified) {
+      const error = new Error("Your email is not verified yet");
+      error.statusCode = 403;
       throw error;
     }
     const token = jwt.sign(
@@ -125,7 +151,7 @@ exports.sendVerification = async (req, res, next) => {
       htmlTemplate
     );
 
-    res.status(201).json({
+    res.status(200).json({
       message: "Verification email sent",
     });
   } catch (err) {

@@ -22,9 +22,9 @@ const userSchema = new Schema({
   isVerified: {
     type: Boolean,
     required: true,
-    default: true,
+    default: false,
   },
-  points: {
+  balance: {
     type: Number,
     required: true,
     default: 0,

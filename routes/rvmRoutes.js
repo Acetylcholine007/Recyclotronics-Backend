@@ -34,10 +34,25 @@ router.patch("/reportScan/:rvmSerial", rvmController.reportScan); //For RVM mach
 
 router.patch("/reportStatus/:rvmSerial", rvmController.reportStatus); //For RVM machine
 
-router.put("/updateRVM/:rvmSerial", userAuthMW, rvmController.putRVM);
+router.put(
+  "/updateRVM/:rvmSerial",
+  userAuthMW,
+  [
+    body("collectorEmail").isEmail().trim().not().isEmpty(),
+    body("rvmSerial").not().isEmpty(),
+    body("status").not().isEmpty(),
+    body("binGauge").not().isEmpty(),
+    body("timeout").not().isEmpty(),
+  ],
+  rvmController.putRVM
+);
 
-router.post("/sendNotification", userAuthMW, rvmController.sendNotification);
+router.post(
+  "/sendNotification/:rvmSerial",
+  userAuthMW,
+  rvmController.sendNotification
+);
 
-router.post("/collect", userAuthMW, rvmController.collect);
+router.post("/collect/:rvmSerial", userAuthMW, rvmController.collect);
 
 module.exports = router;

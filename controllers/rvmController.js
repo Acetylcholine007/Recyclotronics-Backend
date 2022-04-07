@@ -4,6 +4,7 @@ const Scrap = require("../models/Scrap");
 const Transaction = require("../models/Transaction");
 const User = require("../models/User");
 const io = require("../utils/socket");
+const sendMail = require("../utils/sendMail");
 
 exports.getRVM = async (req, res, next) => {
   try {
@@ -106,7 +107,8 @@ exports.reportScan = async (req, res, next) => {
         });
         await transaction.save();
         const user = await User.findById(rvm.user);
-        user.points += req.body.weight * scrap.pointsPerGram;
+        user.balance +=
+          req.body.weight * scrap.pointsPerGram * scrap.pesoPerPoints;
         await user.save();
 
         io.getIO().emit("scan", {
@@ -165,8 +167,13 @@ exports.reportStatus = async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
+    if (req.body.binGauge > 100 || req.body.binGauge < 0) {
+      const error = new Error("Bin gauge percentage out of bounds");
+      error.statusCode = 404;
+      throw error;
+    }
 
-    rvm.binGauge += +req.body.binGauge;
+    rvm.binGauge = +req.body.binGauge;
     await rvm.save();
 
     res
@@ -182,6 +189,14 @@ exports.reportStatus = async (req, res, next) => {
 
 exports.putRVM = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error("Failed to pass validation");
+      error.statusCode = 422;
+      error.data = errors.array();
+      throw error;
+    }
+
     const rvmSerial = req.params.rvmSerial;
     const rvm = await RVM.findOne({ rvmSerial });
     if (!rvm) {
@@ -192,7 +207,7 @@ exports.putRVM = async (req, res, next) => {
     rvm.rvmSerial = req.body.rvmSerial;
     rvm.status = req.body.status;
     rvm.binGauge = req.body.binGauge;
-    rvm.timestamp = req.body.timestamp;
+    rvm.collectorEmail = req.body.collectorEmail;
     rvm.timeout = req.body.timeout;
     await rvm.save();
     res.status(200).json({ message: "RVM updated.", rvm });
@@ -206,8 +221,21 @@ exports.putRVM = async (req, res, next) => {
 
 exports.sendNotification = async (req, res, next) => {
   try {
-    //TODO: Implement logic
-    res.status(200).json({ message: "RVM updated." });
+    const rvmSerial = req.params.rvmSerial;
+    const rvm = await RVM.findOne({ rvmSerial });
+    if (!rvm) {
+      const error = new Error("Could not find RVM.");
+      error.statusCode = 404;
+      throw error;
+    }
+    const result = await sendMail.sendMailPromise(
+      rvm.collectorEmail,
+      "BIN COLLECTION NOTIFICATION",
+      null,
+      "This is to inform you that the bin is now full and ready for collection. Thank you."
+    );
+    console.log(result);
+    res.status(200).json({ message: "Notification email sent" });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -218,8 +246,28 @@ exports.sendNotification = async (req, res, next) => {
 
 exports.collect = async (req, res, next) => {
   try {
-    //TODO: Implement logic
-    res.status(200).json({ message: "RVM updated." });
+    const rvmSerial = req.params.rvmSerial;
+    const rvm = await RVM.findOne({ rvmSerial });
+    if (!rvm) {
+      const error = new Error("Could not find RVM.");
+      error.statusCode = 404;
+      throw error;
+    }
+    rvm.collectionHistory = [
+      ...rvm.collectionHistory,
+      {
+        timestamp: req.body.timestamp,
+        status: req.body.status,
+      },
+    ];
+    await rvm.save();
+    res.status(200).json({
+      message: "RVM updated.",
+      data: {
+        timestamp: req.body.timestamp,
+        status: req.body.status,
+      },
+    });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

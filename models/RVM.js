@@ -22,6 +22,10 @@ const rvmSchema = new Schema(
       required: true,
       default: 0,
     },
+    collectorEmail: {
+      type: String,
+      required: true,
+    },
     timeout: {
       type: Number,
       required: true,

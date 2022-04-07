@@ -53,8 +53,8 @@ exports.redeem = async (req, res, next) => {
     //   })
     // );
 
-    if (amount <= user.points) {
-      user.points -= amount;
+    if (amount <= user.balance) {
+      user.balance -= amount;
       const transaction = new Transaction({
         user: user._id,
         action: "REDEEM",
@@ -67,13 +67,13 @@ exports.redeem = async (req, res, next) => {
         { amount }
       );
       sendMail.sendMail(
-        "rahinoquijano@gmail.com",
+        user.email,
         "REDEEM POINTS",
         htmlTemplate
       );
       res
         .status(200)
-        .json({ message: "Amount redeemed", data: { balance: user.points } });
+        .json({ message: "Amount redeemed", data: { balance: user.balance } });
     } else {
       res.status(406).json({
         message: "Amount trying to claim is more than the amount you have.",
