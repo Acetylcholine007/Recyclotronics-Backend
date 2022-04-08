@@ -97,6 +97,7 @@ exports.login = async (req, res, next) => {
         token: token,
         userId: loadedUser._id.toString(),
         accountType: loadedUser.accountType,
+        fullname: loadedUser.fullname,
       },
     });
   } catch (err) {

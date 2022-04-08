@@ -73,7 +73,12 @@ exports.initiateScan = async (req, res, next) => {
     ) {
       res.status(200).json({ message: "RVM scan already initiated." });
     } else {
-      res.status(409).json({ message: "RVM is busy scanning." });
+      res
+        .status(409)
+        .json({
+          message:
+            "RVM is currently processing a different user request. Try again after 3 minutes.",
+        });
     }
   } catch (err) {
     if (!err.statusCode) {

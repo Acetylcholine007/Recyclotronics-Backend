@@ -32,7 +32,7 @@ app.use(errorMW);
 
 mongoose
   .connect(
-    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.0zw4e.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}?retryWrites=true`
+    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.m9ya0.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}?retryWrites=true`
   )
   .then((result) => {
     console.log("Connected to MongoDB");

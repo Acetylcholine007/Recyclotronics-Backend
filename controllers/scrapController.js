@@ -80,7 +80,7 @@ exports.putScrap = async (req, res, next) => {
     scrap.pointsPerGram = req.body.pointsPerGram;
     scrap.pesoPerPoints = req.body.pesoPerPoints;
     await scrap.save();
-    res.status(201).json({
+    res.status(200).json({
       message: "Scrap updated",
       data: scrap,
     });
@@ -97,7 +97,7 @@ exports.deleteScrap = async (req, res, next) => {
     const scrapId = req.params.scrapId;
     await Scrap.findByIdAndRemove(scrapId);
 
-    res.status(201).json({
+    res.status(200).json({
       message: "Scrap removed",
     });
   } catch (err) {

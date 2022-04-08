@@ -73,7 +73,7 @@ exports.redeem = async (req, res, next) => {
       );
       res
         .status(200)
-        .json({ message: "Amount redeemed", data: { balance: user.balance } });
+        .json({ message: "Amount redeemed. Check your email for confirmation.", data: { balance: user.balance } });
     } else {
       res.status(406).json({
         message: "Amount trying to claim is more than the amount you have.",
