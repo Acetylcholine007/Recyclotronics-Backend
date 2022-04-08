@@ -56,4 +56,4 @@ async function scanWaste(rvmSerial, scrap) {
 }
 
 //VIRTUAL RVM INSTANCES
-scanWaste("ABCD", "Camera");
+scanWaste("ABCD", "Laptop");

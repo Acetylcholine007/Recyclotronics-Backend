@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
+const path = require("path");
 
 const corsMW = require("./middlewares/corsMW");
 const errorMW = require("./middlewares/errorMW");
@@ -11,15 +12,17 @@ const rvmRoutes = require("./routes/rvmRoutes");
 const scrapRoutes = require("./routes/scrapRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
 const userRoutes = require("./routes/userRoutes");
+const testRoutes = require("./routes/testRoutes"); //TEMPORARY
 
 const app = express();
 
-app.set('view engine', 'ejs');
-app.set('views', 'views');
+app.set("view engine", "ejs");
+app.set("views", "views");
 
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(corsMW);
 
 app.use("/auth", authRoutes);
@@ -27,6 +30,8 @@ app.use("/rvm", rvmRoutes);
 app.use("/scraps", scrapRoutes);
 app.use("/transactions", transactionRoutes);
 app.use("/users", userRoutes);
+
+app.use("/test", testRoutes); //TEMPORARY
 
 app.use(errorMW);
 

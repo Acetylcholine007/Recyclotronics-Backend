@@ -17,6 +17,7 @@ router.post(
         }
       });
     }),
+    body("collectorEmail").isEmail().trim().not().isEmpty(),
   ],
   userAuthMW,
   rvmController.postRVM

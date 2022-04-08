@@ -35,7 +35,7 @@ exports.postRVM = async (req, res, next) => {
     }
     const rvm = new RVM({
       rvmSerial: req.body.rvmSerial,
-      timestamp: new Date().toISOString(),
+      collectorEmail: req.body.collectorEmail,
     });
     await rvm.save();
     res.status(200).json({ message: "RVM created.", rvm });
@@ -73,12 +73,10 @@ exports.initiateScan = async (req, res, next) => {
     ) {
       res.status(200).json({ message: "RVM scan already initiated." });
     } else {
-      res
-        .status(409)
-        .json({
-          message:
-            "RVM is currently processing a different user request. Try again after 3 minutes.",
-        });
+      res.status(409).json({
+        message:
+          "RVM is currently processing a different user request. Try again after 3 minutes.",
+      });
     }
   } catch (err) {
     if (!err.statusCode) {
