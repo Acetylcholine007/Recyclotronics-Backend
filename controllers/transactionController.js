@@ -4,6 +4,7 @@ const User = require("../models/User");
 const sendMail = require("../utils/sendMail");
 const ejs = require("ejs");
 const path = require("path");
+const barcodeGenerator = require("../utils/barcodeGenerator");
 
 exports.getTransactions = async (req, res, next) => {
   const action = req.query.target || null;
@@ -62,18 +63,21 @@ exports.redeem = async (req, res, next) => {
       });
       await user.save();
       await transaction.save();
+
+      const barcode = barcodeGenerator.generateBarcode(
+        transaction._id.toString()
+      );
       const htmlTemplate = await ejs.renderFile(
         path.join(__dirname, "../views/redeemPoints.ejs"),
-        { amount }
+        { amount, barcode }
       );
-      sendMail.sendMail(
-        user.email,
-        "REDEEM POINTS",
-        htmlTemplate
-      );
+      sendMail.sendMail(user.email, "REDEEM POINTS", htmlTemplate);
       res
         .status(200)
-        .json({ message: "Amount redeemed. Check your email for confirmation.", data: { balance: user.balance } });
+        .json({
+          message: "Amount redeemed. Check your email for confirmation.",
+          data: { balance: user.balance },
+        });
     } else {
       res.status(406).json({
         message: "Amount trying to claim is more than the amount you have.",

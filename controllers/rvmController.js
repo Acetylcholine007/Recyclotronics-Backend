@@ -243,6 +243,7 @@ exports.sendNotification = async (req, res, next) => {
       htmlTemplate
     );
     console.log(result);
+    
     res.status(200).json({ message: "Notification email sent" });
   } catch (err) {
     if (!err.statusCode) {

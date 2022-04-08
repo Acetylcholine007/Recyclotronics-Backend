@@ -1,3 +1,5 @@
+const barcodeGenerator = require("../utils/barcodeGenerator");
+
 exports.emailVerification = async (req, res, next) => {
   res.render("emailVerification", {
     verificationToken: "a",
@@ -5,8 +7,10 @@ exports.emailVerification = async (req, res, next) => {
 };
 
 exports.redeemPoints = async (req, res, next) => {
+  const barcode = barcodeGenerator.generateBarcode("10");
   res.render("redeemPoints", {
     amount: 10,
+    barcode
   });
 };
 
