@@ -4,23 +4,43 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/styles/styles.css" />
+    <link rel="stylesheet" href="/styles/redeemEmail.css" />
     <title>Email Verification</title>
   </head>
   <body>
-    <form
+    <center class="wrapper">
+      <table class="main">
+          <tr>
+            <td height="330" style="text-align: center; background-color: #414141;">
+              <form
       action="https://recyclotronics.herokuapp.com/auth/user/verify"
       id="verificationForm"
       method="POST"
     >
-      <h1>Verify your email by clicking Verify button</h1>
+      <h1 style="color: #ffffff; font-size: 3rem;">Verify your email!<br><p style="font-size: 1.5rem; margin-top: 1rem;">Click the button below.</p></h1>
       <input
         type="hidden"
         name="verificationToken"
         value="<%= verificationToken %>"
       />
-      <button type="submit">Verify</button>
+      <button type="submit" class="verify-button">Verify</button>
     </form>
-    <h1>Real</h1>
+            </td>
+          </tr>
+          <tr>
+            <td height="10" style="background-color: #a3da8d ;"></td>
+          </tr>
+          <tr>
+            <td height="250" style="text-align: center;">
+            <p style="margin-top: 125px; font-weight: 600; color: #414141;">Thank you for using Reverse Vending Machine</p>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <img src="/images/BG.png" alt="Background-image" width="600" style="max-width: 100%;">
+            </td>
+          </tr>
+      </table>
+    </center>
   </body>
 </html>
