@@ -51,6 +51,19 @@ table{
 .button-link:hover{
     background-color: #94c780;
 }
+.verify-button{
+    margin-top: 2rem;
+    text-decoration: none;
+    background-color: #a3da8d;
+    padding: 1rem;
+    color: #414141;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
 
 @media screen and (max-width: 380px) {
     .successfull{
