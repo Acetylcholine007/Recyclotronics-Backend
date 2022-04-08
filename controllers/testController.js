@@ -13,3 +13,7 @@ exports.redeemPoints = async (req, res, next) => {
 exports.verificationResult = async (req, res, next) => {
   res.render("verificationResult", { message: "Email successfully verified" });
 };
+
+exports.collectionNotif = async (req, res, next) => {
+  res.render("collectionNotif", {});
+};

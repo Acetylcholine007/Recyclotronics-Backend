@@ -5,6 +5,8 @@ const Transaction = require("../models/Transaction");
 const User = require("../models/User");
 const io = require("../utils/socket");
 const sendMail = require("../utils/sendMail");
+const ejs = require("ejs");
+const path = require("path");
 
 exports.getRVM = async (req, res, next) => {
   try {
@@ -231,11 +233,14 @@ exports.sendNotification = async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
+    const htmlTemplate = await ejs.renderFile(
+      path.join(__dirname, "../views/collectionNotif.ejs"),
+      {}
+    );
     const result = await sendMail.sendMailPromise(
       rvm.collectorEmail,
       "BIN COLLECTION NOTIFICATION",
-      null,
-      "This is to inform you that the bin is now full and ready for collection. Thank you."
+      htmlTemplate
     );
     console.log(result);
     res.status(200).json({ message: "Notification email sent" });
