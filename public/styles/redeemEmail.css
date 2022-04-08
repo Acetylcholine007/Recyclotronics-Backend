@@ -39,6 +39,18 @@ table{
     color: #a3da8d; 
     font-size: 25px;
 }
+.button-link{
+    text-decoration: none;
+    background-color: #a3da8d;
+    padding: 1rem;
+    color: #414141;
+    border-radius: 10px;
+    font-family: inherit;
+    font-weight: 600;
+}
+.button-link:hover{
+    background-color: #94c780;
+}
 
 @media screen and (max-width: 380px) {
     .successfull{
