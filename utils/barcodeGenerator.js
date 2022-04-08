@@ -1,5 +1,8 @@
 const JsBarcode = require("jsbarcode");
 const { DOMImplementation, XMLSerializer } = require("xmldom");
+const { createCanvas } = require("canvas");
+const fs = require("fs");
+const path = require("path")
 
 module.exports = {
   generateBarcode: (dataString) => {
@@ -18,6 +21,16 @@ module.exports = {
       xmlDocument: document,
     });
 
-    return (svgText = xmlSerializer.serializeToString(svgNode));
+    return xmlSerializer.serializeToString(svgNode);
+  },
+  generateBarcodeImage: (dataString) => {
+    const canvas = createCanvas();
+
+    JsBarcode(canvas, dataString);
+
+    // const buffer = canvas.toBuffer("image/png");
+    // fs.writeFileSync(path.join(__dirname, "../public/barcode/barcode.png"), buffer);
+
+    return canvas;
   },
 };

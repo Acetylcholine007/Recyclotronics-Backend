@@ -12,4 +12,6 @@ router.get("/verificationResult", testController.verificationResult);
 
 router.get("/collectionNotif", testController.collectionNotif);
 
+router.get("/generateBarcode/:data", testController.generateBarcode)
+
 module.exports = router;

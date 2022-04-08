@@ -89,7 +89,7 @@
             <td height="330" style="text-align: center; background-color: #414141;">
               <p class="successfull"> - - - - - - Transaction Successful - - - - - - </p>
               <h1 class="redeem">You have redeemed<br><p class="amount"><%= amount %> Pesos!</p></h1>
-              <%- barcode %>
+              <img src="https://recyclotronics.herokuapp.com/transactions/generateBarcode/<%= tid %>" alt="barcode">
             </td>
           </tr>
           <tr>

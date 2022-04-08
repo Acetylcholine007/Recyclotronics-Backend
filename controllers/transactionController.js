@@ -64,20 +64,15 @@ exports.redeem = async (req, res, next) => {
       await user.save();
       await transaction.save();
 
-      const barcode = barcodeGenerator.generateBarcode(
-        transaction._id.toString()
-      );
       const htmlTemplate = await ejs.renderFile(
         path.join(__dirname, "../views/redeemPoints.ejs"),
-        { amount, barcode }
+        { amount, tid: transaction._id.toString() }
       );
       sendMail.sendMail(user.email, "REDEEM POINTS", htmlTemplate);
-      res
-        .status(200)
-        .json({
-          message: "Amount redeemed. Check your email for confirmation.",
-          data: { balance: user.balance },
-        });
+      res.status(200).json({
+        message: "Amount redeemed. Check your email for confirmation.",
+        data: { balance: user.balance },
+      });
     } else {
       res.status(406).json({
         message: "Amount trying to claim is more than the amount you have.",
@@ -151,4 +146,11 @@ exports.deleteTransaction = async (req, res, next) => {
     }
     next(err);
   }
+};
+
+exports.generateBarcode = async (req, res, next) => {
+  const data = req.params.data;
+  const canvas = barcodeGenerator.generateBarcodeImage(data);
+  res.setHeader("Content-Type", "image/png");
+  canvas.pngStream().pipe(res);
 };
