@@ -4,11 +4,32 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/styles/styles.css" />
+    <link rel="stylesheet" href="/styles/redeemEmail.css" />
     <title>Email Verification</title>
   </head>
   <body>
-    <h1><%= message%></h1>
-      <a href="https://recyclotronics-f0907.web.app/">Go to Web App</a>
+    <center class="wrapper">
+      <table class="main">
+          <tr>
+            <td height="400" style="text-align: center; background-color: #414141;">
+              <h1 style="color: #ffffff;"><p class="amount" style="margin-bottom: 1.2rem;"><%= message%></p></h1>
+              <a href="https://recyclotronics-f0907.web.app/" class="button-link">Go to Web App</a>
+            </td>
+          </tr>
+          <tr>
+            <td height="10" style="background-color: #a3da8d ;"></td>
+          </tr>
+          <tr>
+            <td height="180" style="text-align: center;">
+            <p style="margin-top: 125px; font-weight: 600; color: #414141;">Thank you for using Reverse Vending Machine</p>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <img src="/images/BG.png" alt="Background-image" width="600" style="max-width: 100%;">
+            </td>
+          </tr>
+      </table>
+    </center>
   </body>
 </html>
