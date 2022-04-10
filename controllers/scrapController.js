@@ -77,6 +77,7 @@ exports.putScrap = async (req, res, next) => {
     const scrap = await Scrap.findById(scrapId);
     
     scrap.name = req.body.name;
+    scrap.previousPPG = scrap.pointsPerGram;
     scrap.pointsPerGram = req.body.pointsPerGram;
     scrap.pesoPerPoints = req.body.pesoPerPoints;
     await scrap.save();

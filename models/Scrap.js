@@ -12,6 +12,11 @@ const scrapSchema = new Schema(
       required: true,
       default: 1,
     },
+    previousPPG: {
+      type: Number,
+      required: true,
+      default: 1,
+    },
     pesoPerPoints: {
       type: Number,
       required: true,
