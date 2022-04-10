@@ -227,6 +227,7 @@ exports.putRVM = async (req, res, next) => {
 exports.sendNotification = async (req, res, next) => {
   try {
     const rvmSerial = req.params.rvmSerial;
+    const message = req.body.message;
     const rvm = await RVM.findOne({ rvmSerial });
     if (!rvm) {
       const error = new Error("Could not find RVM.");
@@ -235,7 +236,7 @@ exports.sendNotification = async (req, res, next) => {
     }
     const htmlTemplate = await ejs.renderFile(
       path.join(__dirname, "../views/collectionNotif.ejs"),
-      {}
+      {message}
     );
     const result = await sendMail.sendMailPromise(
       rvm.collectorEmail,

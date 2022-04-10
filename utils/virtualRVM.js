@@ -1,6 +1,6 @@
 const axios = require("axios").default;
-// const URL = "https://recyclotronics.herokuapp.com";
-const URL = "http://localhost:8000";
+const URL = "https://recyclotronics.herokuapp.com";
+// const URL = "http://localhost:8000";
 
 async function scanWaste(rvmSerial, scrap) {
   try {

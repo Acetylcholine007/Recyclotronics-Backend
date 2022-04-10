@@ -50,7 +50,6 @@ router.put(
 
 router.post(
   "/sendNotification/:rvmSerial",
-  userAuthMW,
   rvmController.sendNotification
 );
 
