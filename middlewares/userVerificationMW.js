@@ -1,15 +1,7 @@
 const jwt = require("jsonwebtoken");
-const { validationResult } = require("express-validator/check");
 
 module.exports = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new Error("Failed to pass validation");
-    error.statusCode = 422;
-    error.data = errors.array();
-    throw error;
-  }
-  const token = req.body.verificationToken;
+  const token = req.params.verificationToken;
   if (!token) {
     const error = new Error("Failed to verify.");
     error.statusCode = 401;

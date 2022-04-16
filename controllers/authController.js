@@ -131,6 +131,29 @@ exports.verifyUser = async (req, res, next) => {
   }
 };
 
+exports.verifyUser = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.verifyEmail });
+    console.log(user);
+    if (!user) {
+      const error = new Error("Email does not exist");
+      error.statusCode = 401;
+      throw error;
+    }
+    user.isVerified = true;
+    await user.save();
+
+    res.render('verificationResult', {
+      message: "Verification successful"
+    });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
 exports.sendVerification = async (req, res, next) => {
   try {
     const verificationToken = jwt.sign(

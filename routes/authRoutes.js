@@ -36,9 +36,8 @@ router.post(
   authController.login
 );
 
-router.post(
-  "/user/verify",
-  [body("verificationToken").not().isEmpty()],
+router.get(
+  "/user/verify/:verificationToken",
   userVerificationMW,
   authController.verifyUser
 );
