@@ -7,12 +7,12 @@ const scrapSchema = new Schema(
       type: String,
       required: true,
     },
-    pointsPerGram: {
+    pointsPerKilo: {
       type: Number,
       required: true,
       default: 1,
     },
-    previousPPG: {
+    previousPPK: {
       type: Number,
       required: true,
       default: 1,

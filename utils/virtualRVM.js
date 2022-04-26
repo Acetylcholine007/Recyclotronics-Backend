@@ -1,6 +1,6 @@
 const axios = require("axios").default;
-const URL = "https://recyclotronics.herokuapp.com";
-// const URL = "http://localhost:8000";
+// const URL = "https://recyclotronics.herokuapp.com";
+const URL = "http://localhost:8000";
 
 async function scanWaste(rvmSerial, scrap) {
   try {
@@ -36,7 +36,7 @@ async function scanWaste(rvmSerial, scrap) {
       `${URL}/rvm/reportScan/${rvmSerial}`,
       {
         scanResult: result,
-        scrapType: result ? picture : "Unidentified",
+        scrapType: result ? picture : picture == "Multiple" ? "Multiple" : "Unidentified",
         weight: 10,
       }
     );
@@ -56,4 +56,4 @@ async function scanWaste(rvmSerial, scrap) {
 }
 
 //VIRTUAL RVM INSTANCES
-scanWaste("ABCD", "Laptop");
+scanWaste("ABCD", "Multiple");

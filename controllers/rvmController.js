@@ -106,14 +106,14 @@ exports.reportScan = async (req, res, next) => {
           data: {
             scrapType: req.body.scrapType,
             weight: req.body.weight,
-            pointsPerGram: scrap.pointsPerGram,
+            pointsPerKilo: scrap.pointsPerKilo,
             pesoPerPoints: scrap.pesoPerPoints,
           },
         });
         await transaction.save();
         const user = await User.findById(rvm.user);
         user.balance +=
-          req.body.weight * scrap.pointsPerGram * scrap.pesoPerPoints;
+          req.body.weight * scrap.pointsPerKilo * scrap.pesoPerPoints;
         await user.save();
 
         io.getIO().emit("scan", {
@@ -121,7 +121,7 @@ exports.reportScan = async (req, res, next) => {
           payload: {
             scrapType: req.body.scrapType,
             weight: req.body.weight,
-            pointsPerGram: scrap.pointsPerGram,
+            pointsPerKilo: scrap.pointsPerKilo,
             pesoPerPoints: scrap.pesoPerPoints,
           },
         });
@@ -136,7 +136,7 @@ exports.reportScan = async (req, res, next) => {
           payload: {
             scrapType: req.body.scrapType,
             weight: 0,
-            pointsPerGram: 0,
+            pointsPerKilo: 0,
             pesoPerPoints: 0,
           },
         });
