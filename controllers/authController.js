@@ -143,7 +143,7 @@ exports.resetPassword = async (req, res, next) => {
       });
     }
 
-    const password = req.body.password;
+    const password = req.body.newPassword;
     const hashedPw = await bcrypt.hash(password, 12);
     user.password = hashedPw;
     await user.save();
