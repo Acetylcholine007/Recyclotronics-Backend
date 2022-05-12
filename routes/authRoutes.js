@@ -42,6 +42,22 @@ router.get(
   authController.verifyUser
 );
 
+router.get(
+  "/user/resetPasswordForm/:uid",
+  authController.resetPasswordForm
+);
+
+router.post(
+  "/user/resetPassword/:uid",
+  authController.resetPassword
+);
+
+router.post(
+  "/user/sendResetPassword",
+  [body("email").isEmail().trim().not().isEmpty()],
+  authController.sendResetPassword
+);
+
 router.post(
   "/user/sendVerification",
   [body("email").isEmail().trim().not().isEmpty()],

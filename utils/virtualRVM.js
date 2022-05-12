@@ -1,6 +1,6 @@
 const axios = require("axios").default;
-// const URL = "https://recyclotronics.herokuapp.com";
-const URL = "http://localhost:8000";
+const URL = "https://recyclotronics.herokuapp.com";
+// const URL = "http://localhost:8000";
 
 async function scanWaste(rvmSerial, scrap) {
   try {
@@ -32,6 +32,11 @@ async function scanWaste(rvmSerial, scrap) {
     // console.log(initializationResponse.data);
 
     //SENDING LOGIC
+    console.log({
+      scanResult: result,
+      scrapType: result ? picture : picture == "Multiple" ? "Multiple" : "Unidentified",
+      weight: 10,
+    })
     let reportResponse = await axios.patch(
       `${URL}/rvm/reportScan/${rvmSerial}`,
       {

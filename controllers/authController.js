@@ -27,7 +27,7 @@ exports.signup = async (req, res, next) => {
       password: hashedPw,
     });
     const result = await user.save();
-    
+
     //Email verification logic
     const verificationToken = jwt.sign(
       {
@@ -42,11 +42,7 @@ exports.signup = async (req, res, next) => {
       path.join(__dirname, "../views/emailVerification.ejs"),
       { verificationToken }
     );
-    sendMail.sendMail(
-      req.body.email,
-      "VERIFY EMAIL",
-      htmlTemplate
-    );
+    sendMail.sendMail(req.body.email, "VERIFY EMAIL", htmlTemplate);
 
     res
       .status(201)
@@ -120,8 +116,8 @@ exports.verifyUser = async (req, res, next) => {
     user.isVerified = true;
     await user.save();
 
-    res.render('verificationResult', {
-      message: "Verification successful"
+    res.render("verificationResult", {
+      message: "Verification successful",
     });
   } catch (err) {
     if (!err.statusCode) {
@@ -131,20 +127,70 @@ exports.verifyUser = async (req, res, next) => {
   }
 };
 
-exports.verifyUser = async (req, res, next) => {
+exports.resetPassword = async (req, res, next) => {
   try {
-    const user = await User.findOne({ email: req.verifyEmail });
-    console.log(user);
+    const user = await User.findById(req.params.uid);
     if (!user) {
-      const error = new Error("Email does not exist");
-      error.statusCode = 401;
-      throw error;
+      res.render("resetPasswordResult", {
+        message: "Password Reset unsuccessful, user not found.",
+      });
     }
-    user.isVerified = true;
+
+    if (req.body.newPassword !== req.body.confirmPassword) {
+      res.render("resetPasswordForm", {
+        uid: req.params.uid,
+        isValid: false,
+      });
+    }
+
+    const password = req.body.password;
+    const hashedPw = await bcrypt.hash(password, 12);
+    user.password = hashedPw;
     await user.save();
 
-    res.render('verificationResult', {
-      message: "Verification successful"
+    res.render("resetPasswordResult", {
+      message: "Password Reset successful",
+    });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.resetPasswordForm = async (req, res, next) => {
+  try {
+    res.render("resetPasswordForm", {
+      uid: req.params.uid,
+      isValid: true,
+    });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.sendResetPassword = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    const uid = user._id.toString();
+    console.log(uid);
+
+    const htmlTemplate = await ejs.renderFile(
+      path.join(__dirname, "../views/resetPasswordLink.ejs"),
+      { uid }
+    );
+    await sendMail.sendMail(
+      req.body.email,
+      "RESET PASSWORD LINK",
+      htmlTemplate
+    );
+
+    res.status(200).json({
+      message: "Password reset link was sent to your email",
     });
   } catch (err) {
     if (!err.statusCode) {
@@ -169,11 +215,7 @@ exports.sendVerification = async (req, res, next) => {
       path.join(__dirname, "../views/emailVerification.ejs"),
       { verificationToken }
     );
-    sendMail.sendMail(
-      req.body.email,
-      "VERIFY EMAIL",
-      htmlTemplate
-    );
+    sendMail.sendMail(req.body.email, "VERIFY EMAIL", htmlTemplate);
 
     res.status(200).json({
       message: "Verification email sent",
