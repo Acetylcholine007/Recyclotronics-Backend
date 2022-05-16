@@ -19,12 +19,13 @@ exports.getTransactions = async (req, res, next) => {
     let totalPoints = 0;
     let totalRedeems = 0;
     allTransactions.forEach((item) => {
-      if(item.action === ' DEPOSIT') {
+      if (item.action === "DEPOSIT") {
         totalPoints += item.data.pointsPerKilo * item.data.weight;
-      } else if (item.action === 'REDEEM') {
-        totalRedeems += item.data.ammount;
+      } else if (item.action === "REDEEM") {
+        totalRedeems += +item.data.amount;
       }
-    })
+    });
+    console.log(totalPoints, totalRedeems);
     const transactions = await Transaction.find(action ? { action } : {})
       .sort({ createdAt: -1 })
       .skip((currentPage - 1) * perPage)
@@ -35,7 +36,7 @@ exports.getTransactions = async (req, res, next) => {
       data: transactions,
       totalItems,
       totalPoints,
-      totalRedeems
+      totalRedeems,
     });
   } catch (err) {
     if (!err.statusCode) {
@@ -108,16 +109,16 @@ exports.getUserTransactions = async (req, res, next) => {
     const totalItems = await Transaction.find(
       action ? { user: userId, action } : { user: userId }
     ).countDocuments();
-    let allTransactions = await Transaction.find({user: userId});
+    let allTransactions = await Transaction.find({ user: userId });
     let totalPoints = 0;
     let totalRedeems = 0;
     allTransactions.forEach((item) => {
-      if(item.action === ' DEPOSIT') {
+      if (item.action === "DEPOSIT") {
         totalPoints += item.data.pointsPerKilo * item.data.weight;
-      } else if (item.action === 'REDEEM') {
-        totalRedeems += item.data.ammount;
+      } else if (item.action === "REDEEM") {
+        totalRedeems += +item.data.amount;
       }
-    })
+    });
     const transactions = await Transaction.find(
       action ? { user: userId, action } : { user: userId }
     )
@@ -130,7 +131,7 @@ exports.getUserTransactions = async (req, res, next) => {
       data: transactions,
       totalItems,
       totalPoints,
-      totalRedeems
+      totalRedeems,
     });
   } catch (err) {
     if (!err.statusCode) {
