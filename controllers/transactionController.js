@@ -14,6 +14,14 @@ exports.getTransactions = async (req, res, next) => {
     const totalItems = await Transaction.find(
       action ? { action } : {}
     ).countDocuments();
+    totalPoints = await Transaction.find({});
+    totalPoints = totalPoints
+      .map((item) =>
+        item.action === "DEPOSIT"
+          ? item.data.pointsPerKilo * item.data.weight
+          : 0
+      )
+      .reduce((a, b) => a + b);
     const transactions = await Transaction.find(action ? { action } : {})
       .sort({ createdAt: -1 })
       .skip((currentPage - 1) * perPage)
@@ -23,6 +31,7 @@ exports.getTransactions = async (req, res, next) => {
       message: "Transactions fetched successfully.",
       data: transactions,
       totalItems,
+      totalPoints,
     });
   } catch (err) {
     if (!err.statusCode) {
@@ -95,6 +104,14 @@ exports.getUserTransactions = async (req, res, next) => {
     const totalItems = await Transaction.find(
       action ? { user: userId, action } : { user: userId }
     ).countDocuments();
+    totalPoints = await Transaction.find({});
+    totalPoints = totalPoints
+      .map((item) =>
+        item.action === "DEPOSIT"
+          ? item.data.pointsPerKilo * item.data.weight
+          : 0
+      )
+      .reduce((a, b) => a + b);
     const transactions = await Transaction.find(
       action ? { user: userId, action } : { user: userId }
     )
@@ -106,6 +123,7 @@ exports.getUserTransactions = async (req, res, next) => {
       message: "Transactions fetched successfully.",
       data: transactions,
       totalItems,
+      totalPoints,
     });
   } catch (err) {
     if (!err.statusCode) {
