@@ -102,6 +102,8 @@ exports.cancelScan = async (req, res, next) => {
     rvm.status = "IDLE";
     rvm.user = null;
     await rvm.save();
+
+    res.status(200).json({ message: "RVM scan cancelled." });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
