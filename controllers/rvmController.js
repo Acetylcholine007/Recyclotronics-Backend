@@ -88,6 +88,28 @@ exports.initiateScan = async (req, res, next) => {
   }
 };
 
+exports.cancelScan = async (req, res, next) => {
+  try {
+    const rvmSerial = req.params.rvmSerial;
+    const rvm = await RVM.findOne({ rvmSerial });
+
+    if (!rvm) {
+      const error = new Error("Could not find RVM.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    rvm.status = "IDLE";
+    rvm.user = null;
+    await rvm.save();
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
 exports.reportScan = async (req, res, next) => {
   try {
     const rvmSerial = req.params.rvmSerial;
@@ -236,7 +258,7 @@ exports.sendNotification = async (req, res, next) => {
     }
     const htmlTemplate = await ejs.renderFile(
       path.join(__dirname, "../views/collectionNotif.ejs"),
-      {message}
+      { message }
     );
     const result = await sendMail.sendMailPromise(
       rvm.collectorEmail,
@@ -244,7 +266,7 @@ exports.sendNotification = async (req, res, next) => {
       htmlTemplate
     );
     console.log(result);
-    
+
     res.status(200).json({ message: "Notification email sent" });
   } catch (err) {
     if (!err.statusCode) {

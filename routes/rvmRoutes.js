@@ -31,6 +31,12 @@ router.patch(
   rvmController.initiateScan
 );
 
+router.patch(
+  "/cancelScan/:rvmSerial",
+  userAuthMW,
+  rvmController.cancelScan
+);
+
 router.patch("/reportScan/:rvmSerial", rvmController.reportScan); //For RVM machine
 
 router.patch("/reportStatus/:rvmSerial", rvmController.reportStatus); //For RVM machine
